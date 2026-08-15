@@ -1,0 +1,204 @@
+// Prisma schema — SQLite for local dev, swap "provider" to "postgresql" for production.
+// Models are added incrementally as each feature phase is built.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// SQLite has no native enum type, so roles are stored as a checked string.
+// Valid values: "FARMER" | "BUYER" | "ADMIN" (enforced in application code via zod).
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String?  @unique
+  phone        String?  @unique
+  passwordHash String
+  role         String
+  bio          String?
+  isSuspended  Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  listings       Listing[]      @relation("FarmerListings")
+  orders         Order[]        @relation("BuyerOrders")
+  conversations  Conversation[] @relation("FarmerConversations")
+  purchases      Conversation[] @relation("BuyerConversations")
+  messages       Message[]
+  notifications  Notification[]
+  scans          ScanResult[]
+  reviewsGiven   Review[]       @relation("BuyerReviews")
+  reviewsReceived Review[]      @relation("FarmerReviews")
+  recurringOrders RecurringOrder[]
+  pushSubscriptions PushSubscription[]
+}
+
+model PushSubscription {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+// Status values: "ACTIVE" | "SOLD_OUT" (checked in application code)
+model Listing {
+  id                String   @id @default(cuid())
+  farmerId          String
+  farmer            User     @relation("FarmerListings", fields: [farmerId], references: [id])
+  title             String
+  description       String
+  category          String
+  unit              String // e.g. "kg", "ton", "dozen"
+  pricePerUnit      Float
+  quantityAvailable Float
+  imageUrl          String?
+  status            String   @default("ACTIVE")
+  isHidden          Boolean  @default(false)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  orders          Order[]
+  recurringOrders RecurringOrder[]
+
+  @@index([farmerId])
+  @@index([status])
+}
+
+// Status values: "PENDING" | "CONFIRMED" | "COMPLETED" | "CANCELLED"
+// paymentStatus values: "UNPAID" | "PAID"
+// deliveryStatus values: "NOT_PACKED" | "PACKED" | "OUT_FOR_DELIVERY" | "DELIVERED"
+model Order {
+  id             String   @id @default(cuid())
+  listingId      String
+  listing        Listing  @relation(fields: [listingId], references: [id])
+  buyerId        String
+  buyer          User     @relation("BuyerOrders", fields: [buyerId], references: [id])
+  quantity       Float
+  totalPrice     Float
+  status         String   @default("PENDING")
+  paymentMethod  String   @default("COD")
+  paymentStatus  String   @default("UNPAID")
+  deliveryStatus String   @default("NOT_PACKED")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  review Review?
+
+  @@index([listingId])
+  @@index([buyerId])
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  orderId   String   @unique
+  order     Order    @relation(fields: [orderId], references: [id])
+  buyerId   String
+  buyer     User     @relation("BuyerReviews", fields: [buyerId], references: [id])
+  farmerId  String
+  farmer    User     @relation("FarmerReviews", fields: [farmerId], references: [id])
+  rating    Int
+  comment   String?
+  isHidden  Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([farmerId])
+}
+
+// frequency values: "WEEKLY" | "MONTHLY"
+model RecurringOrder {
+  id            String    @id @default(cuid())
+  buyerId       String
+  buyer         User      @relation(fields: [buyerId], references: [id])
+  listingId     String
+  listing       Listing   @relation(fields: [listingId], references: [id])
+  quantity      Float
+  frequency     String
+  active        Boolean   @default(true)
+  nextOrderDate DateTime
+  lastOrderId   String?
+  createdAt     DateTime  @default(now())
+
+  @@index([buyerId])
+  @@index([nextOrderDate, active])
+}
+
+// One thread per farmer/buyer pair; listingId is just the context it started from.
+model Conversation {
+  id        String   @id @default(cuid())
+  farmerId  String
+  farmer    User     @relation("FarmerConversations", fields: [farmerId], references: [id])
+  buyerId   String
+  buyer     User     @relation("BuyerConversations", fields: [buyerId], references: [id])
+  listingId String?
+  createdAt DateTime @default(now())
+
+  messages Message[]
+
+  @@unique([farmerId, buyerId])
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+  senderId       String
+  sender         User         @relation(fields: [senderId], references: [id])
+  body           String
+  createdAt      DateTime     @default(now())
+  readAt         DateTime?
+
+  @@index([conversationId])
+}
+
+// Type values: "ORDER_PLACED" | "ORDER_STATUS_CHANGED" | "NEW_MESSAGE" | "SCAN_COMPLETE"
+model Notification {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id])
+  type      String
+  title     String
+  body      String
+  link      String?
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
+}
+
+model Guideline {
+  id        String   @id @default(cuid())
+  title     String
+  category  String
+  body      String
+  createdAt DateTime @default(now())
+
+  @@index([category])
+}
+
+// Severity values: "NONE" | "LOW" | "MEDIUM" | "HIGH"
+model ScanResult {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  imageUrl   String
+  cropType   String?
+  isHealthy  Boolean
+  diagnosis  String
+  confidence Float
+  severity   String
+  symptoms   String
+  treatment  String
+  notes      String
+  createdAt  DateTime @default(now())
+
+  @@index([userId])
+}

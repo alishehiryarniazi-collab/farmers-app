@@ -1,0 +1,9 @@
+{
+  "name": "FarmLink.AI",
+  "short_name": "FarmLink.AI",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F5F6F8",
+  "theme_color": "#172A3D",
+  "icons": []
+}

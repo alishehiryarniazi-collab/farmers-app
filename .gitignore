@@ -1,0 +1,28 @@
+# Dependencies
+node_modules/
+
+# Environment / secrets — NEVER commit
+.env
+.env.local
+.env.*.local
+*/.env
+*/.env.local
+
+# Builds
+dist/
+build/
+.next/
+out/
+
+# Database (local dev)
+*.db
+*.db-journal
+prisma/dev.db*
+
+# Uploads / runtime
+uploads/
+
+# Logs & OS
+*.log
+.DS_Store
+Thumbs.db
