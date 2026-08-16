@@ -4,3 +4,6 @@ dist/
 prisma/dev.db
 prisma/dev.db-journal
 uploads/
+
+# local backup of old sqlite migrations (not needed in production)
+prisma/_sqlite_migrations_backup/
