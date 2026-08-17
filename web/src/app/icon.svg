@@ -1,0 +1,56 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <clipPath id="roundedSquare">
+      <rect x="0" y="0" width="1024" height="1024" rx="220" ry="220" />
+    </clipPath>
+    <radialGradient id="tealGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#12b39a" stop-opacity="0.85" />
+      <stop offset="100%" stop-color="#12b39a" stop-opacity="0" />
+    </radialGradient>
+    <radialGradient id="blueGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#0891ff" stop-opacity="0.8" />
+      <stop offset="100%" stop-color="#0891ff" stop-opacity="0" />
+    </radialGradient>
+    <radialGradient id="violetGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#7b5cff" stop-opacity="0.85" />
+      <stop offset="100%" stop-color="#7b5cff" stop-opacity="0" />
+    </radialGradient>
+    <linearGradient id="leafFill" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.16" />
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0.04" />
+    </linearGradient>
+    <filter id="blurBig" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="120" />
+    </filter>
+  </defs>
+
+  <g clip-path="url(#roundedSquare)">
+    <rect x="0" y="0" width="1024" height="1024" fill="#05060a" />
+
+    <g filter="url(#blurBig)">
+      <circle cx="230" cy="220" r="320" fill="url(#tealGlow)" />
+      <circle cx="820" cy="260" r="340" fill="url(#blueGlow)" />
+      <circle cx="760" cy="820" r="360" fill="url(#violetGlow)" />
+    </g>
+
+    <g stroke="rgba(223,240,235,0.75)" stroke-width="7" fill="url(#leafFill)" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M512 148
+               C 700 148 812 300 812 460
+               C 812 660 660 830 512 900
+               C 364 830 212 660 212 460
+               C 212 300 324 148 512 148 Z" />
+    </g>
+
+    <g stroke="rgba(223,240,235,0.6)" stroke-width="6" stroke-linecap="round" fill="none">
+      <path d="M512 230 L512 820" />
+      <path d="M512 360 L400 290" />
+      <path d="M512 360 L624 290" />
+      <path d="M512 500 L370 440" />
+      <path d="M512 500 L654 440" />
+      <path d="M512 650 L390 590" />
+      <path d="M512 650 L634 590" />
+    </g>
+
+    <circle cx="382" cy="298" r="26" fill="#eef6f3" />
+  </g>
+</svg>
