@@ -40,6 +40,28 @@ vision API.
 - 📋 **Inventory / catalog** for farmers to manage their listings.
 - 📱 **Installable PWA** — works on laptop and mobile from one codebase.
 
+## Screenshots
+
+**Farmer dashboard** — every tool in one place.
+
+![Farmer dashboard](docs/screenshots/dashboard.png)
+
+**AI crop-disease scanner** — snap a crop photo and get a diagnosis.
+
+![Crop disease scanner](docs/screenshots/scanner.png)
+
+**Marketplace** — buyers browse listings and order straight from the farmer.
+
+![Marketplace](docs/screenshots/marketplace.png)
+
+**Inventory** — farmers add and manage what they're selling.
+
+![Inventory](docs/screenshots/inventory.png)
+
+**Guidelines** — curated tips on crop health, selling, and staying safe.
+
+![Guidelines](docs/screenshots/guidelines.png)
+
 ## Tech Stack
 
 | Layer      | Technologies                                             |
