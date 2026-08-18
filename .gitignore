@@ -26,3 +26,8 @@ uploads/
 *.log
 .DS_Store
 Thumbs.db
+
+# Junk / temp (safe to delete) — not part of the project
+_DELETE_ME/
+_write_test.txt
+farmlink-architecture-github.png

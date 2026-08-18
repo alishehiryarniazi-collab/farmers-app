@@ -1,81 +1,109 @@
-# Farmers App
+<h1 align="center">🌿 FarmLink.AI</h1>
 
-A web app (works on laptop and mobile browsers, installable as a PWA) for farmers and buyers:
+<p align="center">
+  A full-stack platform that connects <b>farmers</b> and <b>buyers</b> — with an AI crop-disease
+  scanner, a direct marketplace, and real-time chat.
+</p>
 
-1. **AI disease scanner** — upload/photograph a crop, get an AI diagnosis with treatment guidance.
-2. **Direct marketplace** — farmers list produce for sale, buyers browse and purchase directly.
-3. **Login with email or phone number.**
-4. **Real-time chat** between buyers and farmers.
-5. **Notifications, guidelines, and a catalog/inventory** for farmers to manage listings.
+<p align="center">
+  <img src="https://img.shields.io/badge/Next.js-000000?style=flat&logo=next.js&logoColor=white" />
+  <img src="https://img.shields.io/badge/Node.js-339933?style=flat&logo=node.js&logoColor=white" />
+  <img src="https://img.shields.io/badge/TypeScript-3178C6?style=flat&logo=typescript&logoColor=white" />
+  <img src="https://img.shields.io/badge/Prisma-2D3748?style=flat&logo=prisma&logoColor=white" />
+  <img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=flat&logo=tailwind-css&logoColor=white" />
+</p>
 
-## Stack
+---
 
-- **Backend**: Node.js + TypeScript + Express + Prisma (SQLite for local dev, swap to PostgreSQL for
-  production by changing `provider` in `backend/prisma/schema.prisma` and `DATABASE_URL`).
-- **Web**: Next.js (App Router) + TypeScript + Tailwind CSS. Responsive — same codebase serves laptop
-  browsers and mobile browsers, and can be installed on a phone home screen (PWA).
-- **Realtime**: Socket.io (added in the chat phase).
-- **AI**: Anthropic API (vision) for the disease scanner (added in that phase).
+## Overview
 
-> Native mobile (Flutter/React Native) wasn't used because this machine has no Flutter/Android/iOS SDKs
-> installed, and iOS apps can't be built on Windows regardless. The Next.js app is responsive and
-> installable, covering both laptop and mobile without a native toolchain. React Native can be added later
-> against the same backend API if app-store distribution is needed.
+FarmLink.AI is a project I built to learn full-stack development by making something real, not just
+following a tutorial. It lets farmers photograph a crop to get an AI disease diagnosis, list their
+produce for sale, and chat directly with buyers — all in one responsive web app that also installs on a
+phone like a native app. It's still a work in progress, and I keep improving it.
 
-## Project layout
+## Architecture
 
-```
-farmers-app/
-  backend/     Express API + Prisma schema/migrations
-  web/         Next.js frontend
-```
+![FarmLink.AI architecture](docs/architecture.png)
 
-## Running locally
+The app is split into three parts: a **Next.js** web client, an **Express** API, and a database accessed
+through **Prisma**. Real-time chat runs over **Socket.io**, and the crop scanner calls the **Anthropic**
+vision API.
 
-**Backend** (http://localhost:4000):
+## Features
 
+- 🤖 **AI crop-disease scanner** — upload or photograph a crop and get a diagnosis with treatment advice.
+- 🛒 **Direct marketplace** — farmers list produce; buyers browse and order directly.
+- 💬 **Real-time chat** between buyers and farmers (Socket.io).
+- 🔐 **Auth** with email *or* phone number (JWT + bcrypt).
+- 🔔 **Notifications**, guidelines, reviews, and recurring orders.
+- 📋 **Inventory / catalog** for farmers to manage their listings.
+- 📱 **Installable PWA** — works on laptop and mobile from one codebase.
+
+## Tech Stack
+
+| Layer      | Technologies                                             |
+| ---------- | -------------------------------------------------------- |
+| Frontend   | Next.js (App Router), React, TypeScript, Tailwind CSS    |
+| Backend    | Node.js, Express, TypeScript                             |
+| Database   | Prisma ORM — SQLite (dev), PostgreSQL-ready (production) |
+| Realtime   | Socket.io                                                |
+| AI         | Anthropic API (vision) for the disease scanner           |
+| Auth       | JWT, bcrypt                                              |
+| Validation | Zod                                                      |
+
+## Getting Started
+
+### Quick start (Windows)
+Double-click **`start-app.bat`** — it launches the backend and the web app in separate windows.
+Then open <http://localhost:3000>. (`stop-app.bat` stops them.)
+
+### Manual
+**Backend** — http://localhost:4000
 ```bash
 cd backend
 npm install
 npx prisma migrate dev
-npx tsx prisma/seed.ts   # loads starter guidelines content
+npx tsx prisma/seed.ts   # loads starter content
 npm run dev
 ```
 
-To enable the AI disease scanner, put a real key in `backend/.env`:
-
-```
-ANTHROPIC_API_KEY=sk-ant-...
-```
-
-Without a key, the scanner endpoint returns a clear "not configured" error instead of failing silently —
-every other feature works normally.
-
-**Web** (http://localhost:3000):
-
+**Web** — http://localhost:3000
 ```bash
 cd web
 npm install
 npm run dev
 ```
 
-## Features (all built and tested)
+> **AI scanner:** it needs an Anthropic API key. Add `ANTHROPIC_API_KEY=...` to `backend/.env` to enable
+> it. Without a key, the scanner returns a clear "not configured" message and every other feature still
+> works normally.
 
-1. **AI disease scanner** (`/scanner`) — take/upload a crop photo, get an AI diagnosis (Claude Opus 5
-   vision, structured output) with severity, symptoms, and treatment steps. Scan history is saved per user.
-2. **Marketplace** (`/marketplace`, `/inventory`, `/orders`) — farmers list produce with quantity/price,
-   buyers browse/search and order directly; inventory auto-decrements; farmers confirm/cancel/complete orders.
-3. **Auth** (`/login`, `/register`) — email or phone number + password, JWT sessions, farmer/buyer roles.
-4. **Chat** (`/messages`) — real-time messaging between a buyer and a farmer via Socket.io, tied to a
-   listing conversation.
-5. **Notifications** — bell icon with unread badge, real-time push on new orders, order status changes,
-   and new messages.
-6. **Guidelines** (`/guidelines`) — curated tips by category (getting started, crop health, selling, safety).
+## Project Structure
 
-## Known limitations for a production deploy
+```
+farmers-app/
+├── backend/          Express API (TypeScript + Prisma)
+│   └── src/
+│       ├── routes/       API endpoints
+│       ├── services/     business logic
+│       ├── middleware/   auth + error handling
+│       └── prisma.ts     database client
+├── web/              Next.js frontend
+│   └── src/
+│       ├── app/          pages (App Router)
+│       ├── components/   reusable UI
+│       └── lib/          API client, contexts
+└── docs/             diagrams & assets
+```
 
-- SQLite is for local dev only — swap `provider` to `"postgresql"` in `backend/prisma/schema.prisma` and
-  set a real `DATABASE_URL` before deploying.
-- Uploaded scan photos are stored on local disk (`backend/uploads/`) — move to S3/Cloudflare R2 for
-  production so it survives redeploys and scales.
-- No SMS/email delivery for notifications yet — they're in-app (bell + Socket.io) only.
+## Notes
+
+- Built to be deployment-ready: switch the Prisma provider to `postgresql` and set `DATABASE_URL` to run
+  on a hosted database in production.
+- Next up: adding automated tests and a live demo.
+
+## Author
+
+**Ali Sharyar Khan** — BS Information Technology student, learning full-stack development in public.
+📫 alishehiryarniazi@gmail.com
